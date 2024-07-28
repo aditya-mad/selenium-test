@@ -50,3 +50,30 @@ class TestMain:
             assert True
         except:
             assert False
+
+    def test_radioButtons(self, test_setup):
+        radioBtn1 = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "male")))
+        radioBtn2 = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "female")))
+        radioBtn1.click()
+        if not radioBtn1.is_selected() or radioBtn2.is_selected():
+            assert False
+        radioBtn2.click()
+        if not radioBtn2.is_selected() or radioBtn1.is_selected():
+            assert False
+        assert True
+
+    def test_checkBox(self, test_setup):
+        btn1 = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "Automation")))
+        btn2 = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "Performance")))
+
+        btn1.click()
+        if not btn1.is_selected() or btn2.is_selected():
+            assert False
+        btn2.click()
+        if not btn1.is_selected() or not btn2.is_selected():
+            assert False
+        btn1.click()
+        if btn1.is_selected() or not btn2.is_selected():
+            assert False
+        btn2.click()
+        assert not btn1.is_selected() and not btn2.is_selected()
