@@ -2,6 +2,7 @@ import time
 import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
@@ -43,7 +44,6 @@ class TestMain:
         action = ActionChains(driver)
         action.double_click(alertBoxBtn)
         action.perform()
-        alertBoxBtn.click()
         WebDriverWait(driver, 2).until(EC.alert_is_present())
         alert = driver.switch_to.alert
         alert.accept()
@@ -53,28 +53,32 @@ class TestMain:
         radioBtn1 = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "male")))
         radioBtn2 = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "female")))
         radioBtn1.click()
-        if not radioBtn1.is_selected() or radioBtn2.is_selected():
-            assert False
+        assert radioBtn1.is_selected() and not radioBtn2.is_selected()
         radioBtn2.click()
-        if not radioBtn2.is_selected() or radioBtn1.is_selected():
-            assert False
-        assert True
+        assert radioBtn2.is_selected() and not radioBtn1.is_selected()
 
     def test_checkBox(self, test_setup):
         btn1 = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "Automation")))
         btn2 = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "Performance")))
-
         btn1.click()
-        if not btn1.is_selected() or btn2.is_selected():
-            assert False
+        assert btn1.is_selected() and not btn2.is_selected()
         btn2.click()
-        if not btn1.is_selected() or not btn2.is_selected():
-            assert False
+        assert btn1.is_selected() and btn2.is_selected()
         btn1.click()
-        if btn1.is_selected() or not btn2.is_selected():
-            assert False
+        assert not btn1.is_selected() and btn2.is_selected()
         btn2.click()
         assert not btn1.is_selected() and not btn2.is_selected()
+
+    def test_dropDown(self, test_setup):
+        dropdown = Select(driver.find_element(By.ID, "testingDropdown"))
+        dropdown.select_by_value("Automation")
+        assert dropdown.first_selected_option.text == "Automation Testing"
+        dropdown.select_by_value("Performance")
+        assert dropdown.first_selected_option.text == "Performance Testing"
+        dropdown.select_by_value("Manual")
+        assert dropdown.first_selected_option.text == "Manual Testing"
+        dropdown.select_by_value("Database")
+        assert dropdown.first_selected_option.text == "Database Testing"
 
     def test_alertBox(self, test_setup):
         alertBoxBtn = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//button[@onclick="generateAlertBox()"]')))
@@ -91,8 +95,7 @@ class TestMain:
         alert = driver.switch_to.alert
         alert.accept()
         text = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'demo')))
-        if 'OK' not in text.text:
-            assert False
+        assert 'OK' in text.text
         confirmBox.click()
         WebDriverWait(driver, 2).until(EC.alert_is_present())
         alert = driver.switch_to.alert
