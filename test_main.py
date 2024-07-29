@@ -43,13 +43,11 @@ class TestMain:
         action = ActionChains(driver)
         action.double_click(alertBoxBtn)
         action.perform()
-        try:
-            WebDriverWait(driver, 3).until(EC.alert_is_present())
-            alert = driver.switch_to.alert
-            alert.accept()
-            assert True
-        except:
-            assert False
+        alertBoxBtn.click()
+        WebDriverWait(driver, 2).until(EC.alert_is_present())
+        alert = driver.switch_to.alert
+        alert.accept()
+        assert True
 
     def test_radioButtons(self, test_setup):
         radioBtn1 = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "male")))
@@ -77,3 +75,27 @@ class TestMain:
             assert False
         btn2.click()
         assert not btn1.is_selected() and not btn2.is_selected()
+
+    def test_alertBox(self, test_setup):
+        alertBoxBtn = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//button[@onclick="generateAlertBox()"]')))
+        alertBoxBtn.click()
+        WebDriverWait(driver, 2).until(EC.alert_is_present())
+        alert = driver.switch_to.alert
+        alert.accept()
+        assert True
+
+    def test_confirmBox(self, test_setup):
+        confirmBox = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//button[@onclick="generateConfirmBox()"]')))
+        confirmBox.click()
+        WebDriverWait(driver, 2).until(EC.alert_is_present())
+        alert = driver.switch_to.alert
+        alert.accept()
+        text = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'demo')))
+        if 'OK' not in text.text:
+            assert False
+        confirmBox.click()
+        WebDriverWait(driver, 2).until(EC.alert_is_present())
+        alert = driver.switch_to.alert
+        alert.dismiss()
+        text = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'demo')))
+        assert 'Cancel' in text.text
